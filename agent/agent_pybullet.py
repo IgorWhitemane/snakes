@@ -1,6 +1,6 @@
 import pybullet as p
 
-def create_snake_pybullet(segment_count=10, segment_radius=0.1, start_position=(0, 0, 1)):
+def create_snake_pybullet(segment_count=5, segment_radius=0.1, start_position=(0, 0, 1)):
     segments = []
     joints = []
     head_radius = segment_radius * 1.1
@@ -14,7 +14,7 @@ def create_snake_pybullet(segment_count=10, segment_radius=0.1, start_position=(
 
         segment_id = p.createCollisionShape(p.GEOM_SPHERE, radius=radius)
         visual_id = p.createVisualShape(p.GEOM_SPHERE, radius=radius, rgbaColor=color)
-        body_id = p.createMultiBody(baseMass=0.2, baseCollisionShapeIndex=segment_id,
+        body_id = p.createMultiBody(baseMass=1, baseCollisionShapeIndex=segment_id,
                                     baseVisualShapeIndex=visual_id, basePosition=segment_position)
         segments.append(body_id)
 
