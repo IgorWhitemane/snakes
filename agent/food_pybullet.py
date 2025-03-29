@@ -12,7 +12,7 @@ class Food:
                 p.removeBody(self.food_body)
             except:
                 print("ошибка удаления еды")
-        x, y = random.uniform(-8, 8), random.uniform(-8, 8)
+        x, y = random.uniform(-4, 4), random.uniform(-4, 4)
         z = 1
         self.food_body = p.createMultiBody(baseMass=1,
                                            baseCollisionShapeIndex=p.createCollisionShape(p.GEOM_SPHERE,

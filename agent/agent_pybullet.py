@@ -1,6 +1,6 @@
 import pybullet as p
 
-def create_snake_pybullet(segment_count=5, segment_radius=0.1, start_position=(0, 0, 1)):
+def create_snake_pybullet(segment_count=10, segment_radius=0.1, start_position=(0, 0, 1)):
     segments = []
     joints = []
     head_radius = segment_radius * 1.1
@@ -32,6 +32,9 @@ def create_snake_pybullet(segment_count=5, segment_radius=0.1, start_position=(0
                 childFramePosition=child_position
             )
             joints.append(joint_id)
+
+        # Отключаем трение для каждого сегмента
+        p.changeDynamics(body_id, -1, lateralFriction=1.0)
 
     return segments, joints
 

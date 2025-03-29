@@ -5,7 +5,9 @@ import pybullet as p
 
 from agent.agent_pybullet import create_snake_pybullet
 from agent.food_pybullet import Food
+from models.plane_pybullet import create_walls
 from utils.setup_pybullet import setup_pybullet
+
 
 def snake_human():
     setup_pybullet("human")
@@ -22,49 +24,73 @@ def snake_human():
     # Управление
     food = Food()
     food.spawn_food()
+    create_walls()
 
     sim_check = True
 
     # Параметры волны (настраиваются под вашу симуляцию)
-    wave_amplitude = 1.0  # амплитуда бокового смещения (может интерпретироваться как величина боковой силы)
-    wave_frequency = np.pi / 4  # частота волны
-    phase_offset = np.pi / 2  # фазовый сдвиг между сегментами
+    wave_amplitude = 2.0  # амплитуда бокового смещения (может интерпретироваться как величина боковой силы)
+    wave_frequency = np.pi / 8  # частота волны
+    phase_offset = np.pi / 4  # фазовый сдвиг между сегментами
     steer_offset = 0.0  # дополнительный угол поворота
-    base_forward_force = 5  # базовая сила, направленная вперед
     start_time = time.time()
+
+    force_multiplier = 50
 
     while sim_check:
         p.stepSimulation()
         keys = p.getKeyboardEvents()
         time.sleep(1.0 / 240.0)
-        t = time.time() - start_time
+        force = np.array([0, 0, 0])
 
-        if p.B3G_LEFT_ARROW in keys:
-            pass
+        # if p.B3G_LEFT_ARROW in keys:
+        #     pass
+        #
+        # if p.B3G_RIGHT_ARROW in keys:
+        #     pass
+        #
+        # if p.B3G_UP_ARROW in keys:
+        #     # Получаем позиции головы и второго сегмента
+        #     head_pos = np.array(p.getBasePositionAndOrientation(segments[0])[0])
+        #     # second_pos = np.array(p.getBasePositionAndOrientation(segments[1])[0])
+        #     # third_pos = np.array(p.getBasePositionAndOrientation(segments[2])[0])
+        #     # avg_pos = (second_pos + third_pos) / 2
+        #     # direction = avg_pos - head_pos
+        #     norm = np.linalg.norm(head_pos)
+        #     if norm > 0:
+        #         forward_vec = head_pos / norm
+        #     else:
+        #         forward_vec = np.array([1, 0, 0])
+        #
+        #     print(forward_vec)
+        #
+        #     # Определяем боковой вектор (перпендикулярный вектор в плоскости XY)
+        #     lateral_vec = np.array([-forward_vec[1], forward_vec[0], 0])
+        #
+        #     # Применяем силу к голове для движения вперёд
+        #     # p.applyExternalForce(segments[0], -1, forward_vec * base_forward_force, [0, 0, 0], p.WORLD_FRAME)
+        #
+        #     # Применяем волнообразное смещение к остальным сегментам
+        #     for idx, segment in enumerate(segments):
+        #         lateral_force_component = wave_amplitude * np.sin(
+        #             2 * np.pi * wave_frequency * (time.time() - start_time) - idx * phase_offset + steer_offset)
+        #         force = lateral_vec * lateral_force_component
+        #         p.applyExternalForce(segment, -1, force, [0, 0, 0], p.WORLD_FRAME)
+        #
+        # if p.B3G_DOWN_ARROW in keys:
+        #     pass
 
-        if p.B3G_RIGHT_ARROW in keys:
-            pass
+        if p.B3G_UP_ARROW in keys:  # Вперед
+            force = [1, 0, 0]
+        elif p.B3G_DOWN_ARROW in keys:  # Назад
+            force = [-1, 0, 0]
+        elif p.B3G_LEFT_ARROW in keys:  # Влево
+            force = [0, -1, 0]
+        elif p.B3G_RIGHT_ARROW in keys:  # Вправо
+            force = [0, 1, 0]
 
-        if p.B3G_UP_ARROW in keys:
-            # Получаем положение и ориентацию головы для определения направления движения
-            head_pos, head_orn = p.getBasePositionAndOrientation(segments[0])
-            yaw = p.getEulerFromQuaternion(head_orn)[2]
-
-            # Определяем векторы: "вперёд" и "боковой" (перпендикулярный направлению движения)
-            forward_vec = -np.array([np.cos(yaw), np.sin(yaw), 0])
-            lateral_vec = np.array([-np.sin(yaw), np.cos(yaw), 0])
-
-            # Применяем силу к каждому сегменту со смещением по синусоидальной зависимости от индекса
-            for idx, segment in enumerate(segments):
-                # Вычисляем боковую составляющую для текущего сегмента
-                lateral_force_component = wave_amplitude * np.sin(
-                    2 * np.pi * wave_frequency * t - idx * phase_offset + steer_offset)
-                # Итоговый вектор силы: базовая сила вперед плюс боковая составляющая
-                force = forward_vec * base_forward_force + lateral_vec * lateral_force_component
-                p.applyExternalForce(segment, -1, force, [0, 0, 0], p.WORLD_FRAME)
-
-        if p.B3G_DOWN_ARROW in keys:
-            pass
+        force = np.array(force) * force_multiplier
+        p.applyExternalForce(segments[0], -1, force, [0, 0, 0], p.WORLD_FRAME)
 
         if ord('q') in keys:
             sim_check = False
