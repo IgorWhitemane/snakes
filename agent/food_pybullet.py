@@ -10,8 +10,8 @@ class Food:
         if self.food_body is not None:
             try:
                 p.removeBody(self.food_body)
-            except:
-                print("ошибка удаления еды")
+            except Exception as e:
+                print(f"Error removing old food: {e}")
         x, y = random.uniform(-4, 4), random.uniform(-4, 4)
         z = 1
         self.food_body = p.createMultiBody(baseMass=1,
