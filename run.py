@@ -12,8 +12,8 @@ obs, _ = env.reset()
 done = False
 while not done:
     action, _ = model.predict(obs, deterministic=True)  # Делаем предсказание
-    # print(f"Действие от нейросети: {action}")
     obs, reward, done, truncated, info = env.step(action)  # Выполняем шаг
+    print(f"Action: {action}, Reward: {reward}")
 
 # Закрываем окружение
 env.close()
